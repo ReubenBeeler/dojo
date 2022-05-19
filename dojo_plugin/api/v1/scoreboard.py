@@ -9,7 +9,7 @@ from CTFd.models import db, Solves, Challenges
 from CTFd.utils.user import get_current_user
 from CTFd.utils.modes import get_model, generate_account_url
 
-from ...utils import active_dojo_id, dojo_standings
+from ...utils import dojo_route, dojo_standings
 from .belts import get_belts
 
 
@@ -76,13 +76,13 @@ def standing_info(place, standing):
 scoreboard_namespace = Namespace("scoreboard")
 
 
-@scoreboard_namespace.route("/overall/<int:page>")
+@scoreboard_namespace.route("/<dojo>/overall/<int:page>")
 class ScoreboardOverall(Resource):
-    def get(self, page):
+    @dojo_route
+    def get(self, dojo, page):
         user = get_current_user()
-        dojo_id = active_dojo_id(user.id) if user else None
 
-        standings = get_standings(dojo_id=dojo_id)
+        standings = get_standings(dojo_id=dojo.id)
 
         page_size = 20
         start = page_size * page
@@ -103,14 +103,12 @@ class ScoreboardOverall(Resource):
         return result
 
 
-@scoreboard_namespace.route("/weekly")
+@scoreboard_namespace.route("/<dojo>/weekly")
 class ScoreboardWeekly(Resource):
-    def get(self):
-        user = get_current_user()
-        dojo_id = active_dojo_id(user.id) if user else None
-
+    @dojo_route
+    def get(self, dojo):
         week_filter = Solves.date > (datetime.datetime.utcnow() - datetime.timedelta(days=7))
-        standings = get_standings(count=10, filters=[week_filter], dojo_id=dojo_id)
+        standings = get_standings(count=10, filters=[week_filter], dojo_id=dojo.id)
 
         page_standings = list((i + 1, standing) for i, standing in enumerate(standings))
 
