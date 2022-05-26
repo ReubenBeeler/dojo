@@ -180,7 +180,7 @@ RUN git clone https://github.com/jerdna-regeiz/splitmind /opt/splitmind
 RUN ln -s /usr/bin/ipython3 /usr/bin/ipython
 
 RUN mkdir /opt/pwn.college
-COPY docker-entrypoint.sh /opt/pwn.college/docker-entrypoint.sh
+COPY docker-initialize.sh /opt/pwn.college/docker-initialize.sh
 COPY setuid_python.c /opt/pwn.college/setuid_python.c
 COPY vm /opt/pwn.college/vm
 COPY .tmux.conf /opt/pwn.college/.tmux.conf
@@ -205,4 +205,5 @@ RUN find / -type f -perm -4000 | xargs -r chmod u-s
 
 RUN chmod u+s /opt/pwn.college/python /opt/pwn.college/vm/vm
 
+USER hacker
 WORKDIR /home/hacker
